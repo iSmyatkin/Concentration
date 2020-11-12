@@ -10,6 +10,10 @@ import UIKit
 
 class ViewController: UIViewController {
     
+    override func viewDidAppear(_ animated: Bool) {
+        createTimer()
+    }
+    
     lazy var game = Concentration(numberOfPairsOfCards: numberOfPairsOfCards)
     
     var randomTheme = Theme.getRandomTheme()
@@ -19,17 +23,10 @@ class ViewController: UIViewController {
     var numberOfPairsOfCards: Int {
         return (cardButtons.count + 1) / 2
     }
+    var count = 0.0  { didSet { timerLabel.text = "\(customRound(number: count)) seconds" } }
+    var timer: Timer?
     
     var flipCount = 0 { didSet { updateFlipCountLabel() } }
-    
-    func updateFlipCountLabel() {
-        let params: [NSAttributedString.Key: Any] = [
-            .strokeWidth : 5.0,
-            .strokeColor : #colorLiteral(red: 0.9994240403, green: 0.9855536819, blue: 0, alpha: 1)
-        ]
-        let paramString = NSAttributedString(string: "Flips: \(flipCount)", attributes: params)
-        flipCountLabel.attributedText = paramString
-    }
     
     var scoreCount = 0
     {
@@ -38,11 +35,9 @@ class ViewController: UIViewController {
         }
     }
     
-    @IBOutlet weak var flipCountLabel: UILabel! {
-        didSet {
-            updateFlipCountLabel()
-        }
-    }
+    @IBOutlet weak var timerLabel: UILabel!
+    
+    @IBOutlet weak var flipCountLabel: UILabel! { didSet { updateFlipCountLabel() } }
     @IBOutlet weak var scoreLabel: UILabel!
     @IBOutlet var cardButtons: [UIButton]!
     
@@ -63,6 +58,49 @@ class ViewController: UIViewController {
         randomTheme = Theme.getRandomTheme()
         emojiChoices = randomTheme.emoji
         updateViewFromModel()
+        createTimer()
+    }
+    
+    
+    // MARK:  refactor rounding
+    func customRound(number: Double) -> String {
+        let formatter = NumberFormatter()
+        formatter.maximumFractionDigits = 1
+        formatter.minimumFractionDigits = 1
+        formatter.roundingMode = .halfUp
+        formatter.numberStyle = .none
+        return formatter.string(for: number)!
+    }
+    
+    func cancelTimer() {
+      timer?.invalidate()
+      timer = nil
+    }
+    
+    func createTimer() {
+        if timer == nil {
+            let timer = Timer(timeInterval: 0.1,
+                            target: self,
+                            selector: #selector(updateTimer),
+                            userInfo: nil,
+                            repeats: true)
+          RunLoop.current.add(timer, forMode: .common)
+          timer.tolerance = 0.05
+          self.timer = timer
+        }
+    }
+    
+    @objc func updateTimer() {
+        count += 0.1
+    }
+    
+    func updateFlipCountLabel() {
+        let params: [NSAttributedString.Key: Any] = [
+            .strokeWidth : 5.0,
+            .strokeColor : #colorLiteral(red: 0.9994240403, green: 0.9855536819, blue: 0, alpha: 1)
+        ]
+        let paramString = NSAttributedString(string: "Flips: \(flipCount)", attributes: params)
+        flipCountLabel.attributedText = paramString
     }
     
     func updateViewFromModel() {
