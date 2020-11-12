@@ -1,6 +1,6 @@
 //
 //  ViewController.swift
-//  Concentration
+//  Concentration§
 //
 //  Created by Иван Смяткин on 11.09.2020.
 //  Copyright © 2020 Иван Смяткин. All rights reserved.
@@ -11,18 +11,16 @@ import UIKit
 class ViewController: UIViewController {
     
     lazy var game = Concentration(numberOfPairsOfCards: numberOfPairsOfCards)
-    lazy var randomTheme = gameThemes.keys.randomElement()!
-    lazy var emojiFromTheme: String! = gameThemes[randomTheme]
+    
+    var randomTheme = Theme.getRandomTheme()
+    lazy var themeTitle = randomTheme.description
+    lazy var emojiChoices = randomTheme.emoji
     
     var numberOfPairsOfCards: Int {
         return (cardButtons.count + 1) / 2
     }
     
-    var flipCount = 0 {
-        didSet {
-            updateFlipCountLabel()
-        }
-    }
+    var flipCount = 0 { didSet { updateFlipCountLabel() } }
     
     func updateFlipCountLabel() {
         let params: [NSAttributedString.Key: Any] = [
@@ -62,8 +60,8 @@ class ViewController: UIViewController {
         flipCount = 0
         scoreCount = 0
         game = Concentration(numberOfPairsOfCards: (cardButtons.count + 1) / 2)
-        randomTheme = gameThemes.keys.randomElement()!
-        emojiFromTheme = gameThemes[randomTheme]
+        randomTheme = Theme.getRandomTheme()
+        emojiChoices = randomTheme.emoji
         updateViewFromModel()
     }
     
@@ -74,27 +72,19 @@ class ViewController: UIViewController {
             let card = game.cards[index]
             if card.isFaceUp {
                 button.setTitle(emoji(for: card), for: .normal)
-                button.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+                button.backgroundColor = randomTheme.themeColor
             } else {
                 button.setTitle("", for: .normal)
-                button.backgroundColor = card.isMatched ? #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0) : #colorLiteral(red: 1, green: 0.5763723254, blue: 0, alpha: 1)
+                button.backgroundColor = card.isMatched ? #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0) : randomTheme.themeColor
             }
         }
     }
     
-    var gameThemes = [
-        "countries": "🏁🇦🇲🇦🇷🇧🇪🇬🇦🏴󠁧󠁢󠁥󠁮󠁧󠁿🇩🇪🇨🇳🇳🇫🇺🇸",
-        "hearts": "❤️🧡💛💚💙💜🖤💖🤎💔",
-        "fruits":"🍏🍎🍇🍓🍈🍒🍑🍍🥑🥝",
-        "city transport": "🚗🚕🚙🚒🚑🚓🚲🚚🚎🚌",
-        "animals": "🐶🐱🐭🐹🐰🦊🐻🐼🐷🐵",
-        "clothes": "👚👔🧥👠👞🥾🎩🩱🧤🧢"]
-    
     var emoji = [Card:String]()
     
     func emoji(for card: Card) -> String {
-        if emoji[card] == nil, emojiFromTheme.count > 0 {
-            emoji[card] = String(emojiFromTheme.popLast()!)
+        if emoji[card] == nil, emojiChoices.count > 0 {
+            emoji[card] = String(emojiChoices.popLast()!)
         }
         return emoji[card] ?? "?"
         
