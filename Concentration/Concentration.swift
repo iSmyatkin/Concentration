@@ -18,7 +18,7 @@ class Concentration {
         }
     }
     
-    var presentedCardIdentifiers = Set<Int>()
+    var presentedCards = Set<Card>()
     
     var indexOfOneAndOnlyFaceUpCard: Int? {
         get {
@@ -41,12 +41,12 @@ class Concentration {
                     score += 2
                 } else {
                     // MARK:  if isPresented -1 point
-                    //print("before \(presentedCardIdentifiers.sorted())")
-                    if presentedCardIdentifiers.contains(cards[matchIndex].hashValue) { score -= 1 }
-                    if presentedCardIdentifiers.contains(cards[index].hashValue) { score -= 1 }
-                    presentedCardIdentifiers.insert(cards[matchIndex].hashValue)
-                    presentedCardIdentifiers.insert(cards[index].hashValue)
-                    //print("after \(presentedCardIdentifiers.sorted())")
+                    //print("before \(presentedCards.sorted())")
+                    if presentedCards.contains(cards[matchIndex]) { score -= 1 }
+                    if presentedCards.contains(cards[index]) { score -= 1 }
+                    presentedCards.insert(cards[matchIndex])
+                    presentedCards.insert(cards[index])
+                    //print("after \(presentedCards.sorted())")
                 }
                 cards[index].isFaceUp = true
             } else {
