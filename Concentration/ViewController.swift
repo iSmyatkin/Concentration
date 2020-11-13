@@ -23,7 +23,16 @@ class ViewController: UIViewController {
     var numberOfPairsOfCards: Int {
         return (cardButtons.count + 1) / 2
     }
-    var count = 0.0  { didSet { timerLabel.text = "\(customRound(number: count)) seconds" } }
+    
+    var count = 0.0 {
+        didSet {
+            let formatter = DateComponentsFormatter()
+            formatter.unitsStyle = .positional
+            formatter.allowedUnits = [.minute, .second]
+            formatter.zeroFormattingBehavior = [.pad]
+            timerLabel.text = formatter.string(from: count) ?? "??:??"
+        }
+    }
     var timer: Timer?
     
     var flipCount = 0 { didSet { updateFlipCountLabel() } }
@@ -58,18 +67,8 @@ class ViewController: UIViewController {
         randomTheme = Theme.getRandomTheme()
         emojiChoices = randomTheme.emoji
         updateViewFromModel()
+        cancelTimer()
         createTimer()
-    }
-    
-    
-    // MARK:  refactor rounding
-    func customRound(number: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.maximumFractionDigits = 1
-        formatter.minimumFractionDigits = 1
-        formatter.roundingMode = .halfUp
-        formatter.numberStyle = .none
-        return formatter.string(for: number)!
     }
     
     func cancelTimer() {
@@ -79,19 +78,20 @@ class ViewController: UIViewController {
     
     func createTimer() {
         if timer == nil {
-            let timer = Timer(timeInterval: 0.1,
+            let timer = Timer(timeInterval: 1,
                             target: self,
                             selector: #selector(updateTimer),
                             userInfo: nil,
                             repeats: true)
-          RunLoop.current.add(timer, forMode: .common)
-          timer.tolerance = 0.05
-          self.timer = timer
+            RunLoop.current.add(timer, forMode: .common)
+            timer.tolerance = 0.1
+            self.timer = timer
+            count = 0.0
         }
     }
     
     @objc func updateTimer() {
-        count += 0.1
+        count += 1
     }
     
     func updateFlipCountLabel() {
@@ -129,3 +129,12 @@ class ViewController: UIViewController {
     }
 }
 
+//    // MARK:  refactor time rounding
+//    func customRound(number: Double) -> String {
+//        let formatter = NumberFormatter()
+//        formatter.maximumFractionDigits = 1
+//        formatter.minimumFractionDigits = 1
+//        formatter.roundingMode = .halfUp
+//        formatter.numberStyle = .none
+//        return formatter.string(for: number)!
+//    }
