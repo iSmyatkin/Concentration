@@ -15,14 +15,12 @@ struct Card: Hashable {
     var isPresented = false
     private var identifier: Int
     
-    var hashValue: Int { return identifier }
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(self.identifier)
+    }
     
     static func ==(lhs: Card, rhs: Card) -> Bool {
         return lhs.identifier == rhs.identifier
-    }
-    
-    func hash(into hasher: inout Hasher) {
-    
     }
     
     static var identifierFactory = 0
