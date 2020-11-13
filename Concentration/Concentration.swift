@@ -18,9 +18,9 @@ class Concentration {
         }
     }
     
-    var presentedCards = Set<Card>()
+    private var presentedCards = Set<Card>()
     
-    var indexOfOneAndOnlyFaceUpCard: Int? {
+    private var indexOfOneAndOnlyFaceUpCard: Int? {
         get {
             cards.indices.filter { cards[$0].isFaceUp }.oneAndOnly
         }

@@ -15,17 +15,17 @@ class ViewController: UIViewController {
         createTimer()
     }
     
-    lazy var game = Concentration(numberOfPairsOfCards: numberOfPairsOfCards)
+    private lazy var game = Concentration(numberOfPairsOfCards: numberOfPairsOfCards)
     
-    var randomTheme = Theme.getRandomTheme()
-    lazy var themeTitle = randomTheme.description
-    lazy var emojiChoices = randomTheme.emoji
+    private var randomTheme = Theme.getRandomTheme()
+    private var themeTitle: String { randomTheme.description }
+    private lazy var emojiChoices = randomTheme.emoji
     
     var numberOfPairsOfCards: Int {
         return (cardButtons.count + 1) / 2
     }
     
-    var count = 0.0 {
+    private var count = 0.0 {
         didSet {
             let formatter = DateComponentsFormatter()
             formatter.unitsStyle = .positional
@@ -34,24 +34,16 @@ class ViewController: UIViewController {
             timerLabel.text = formatter.string(from: count) ?? "??:??"
         }
     }
-    var timer: Timer?
+    private var timer: Timer?
+    private var flipCount = 0 { didSet { updateFlipCountLabel() } }
+    private var scoreCount = 0 { didSet { scoreLabel.text = "Score: \(scoreCount)" } }
     
-    var flipCount = 0 { didSet { updateFlipCountLabel() } }
+    @IBOutlet private weak var timerLabel: UILabel!
+    @IBOutlet private weak var flipCountLabel: UILabel! { didSet { updateFlipCountLabel() } }
+    @IBOutlet private weak var scoreLabel: UILabel!
+    @IBOutlet private var cardButtons: [UIButton]!
     
-    var scoreCount = 0
-    {
-        didSet {
-            scoreLabel.text = "Score: \(scoreCount)"
-        }
-    }
-    
-    @IBOutlet weak var timerLabel: UILabel!
-    
-    @IBOutlet weak var flipCountLabel: UILabel! { didSet { updateFlipCountLabel() } }
-    @IBOutlet weak var scoreLabel: UILabel!
-    @IBOutlet var cardButtons: [UIButton]!
-    
-    @IBAction func touchCard(_ sender: UIButton) {
+    @IBAction private func touchCard(_ sender: UIButton) {
         flipCount += 1
         if let cardNumber = cardButtons.firstIndex(of: sender) {
             game.chooseCard(at: cardNumber)
@@ -61,23 +53,23 @@ class ViewController: UIViewController {
         }
     }
     
-    @IBAction func touchNewGameButton() {
+    @IBAction private func touchNewGameButton() {
         flipCount = 0
         scoreCount = 0
         game = Concentration(numberOfPairsOfCards: (cardButtons.count + 1) / 2)
         randomTheme = Theme.getRandomTheme()
-        emojiChoices = randomTheme.emoji
+        //emojiChoices = randomTheme.emoji
         updateViewFromModel()
         cancelTimer()
         createTimer()
     }
     
-    func cancelTimer() {
+    private func cancelTimer() {
       timer?.invalidate()
       timer = nil
     }
     
-    func createTimer() {
+    private func createTimer() {
         if timer == nil {
             let timer = Timer(timeInterval: 1,
                             target: self,
@@ -91,11 +83,11 @@ class ViewController: UIViewController {
         }
     }
     
-    @objc func updateTimer() {
+    @objc private func updateTimer() {
         count += 1
     }
     
-    func updateFlipCountLabel() {
+    private func updateFlipCountLabel() {
         let params: [NSAttributedString.Key: Any] = [
             .strokeWidth : 5.0,
             .strokeColor : #colorLiteral(red: 0.9994240403, green: 0.9855536819, blue: 0, alpha: 1)
@@ -104,7 +96,7 @@ class ViewController: UIViewController {
         flipCountLabel.attributedText = paramString
     }
     
-    func updateViewFromModel() {
+    private func updateViewFromModel() {
         scoreCount = game.score
         for index in cardButtons.indices {
             let button = cardButtons[index]
@@ -119,9 +111,9 @@ class ViewController: UIViewController {
         }
     }
     
-    var emoji = [Card:String]()
+    private var emoji = [Card:String]()
     
-    func emoji(for card: Card) -> String {
+    private func emoji(for card: Card) -> String {
         if emoji[card] == nil, emojiChoices.count > 0 {
             emoji[card] = String(emojiChoices.popLast()!)
         }

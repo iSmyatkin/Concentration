@@ -23,9 +23,9 @@ struct Card: Hashable {
         return lhs.identifier == rhs.identifier
     }
     
-    static var identifierFactory = 0
+    private static var identifierFactory = 0
     
-    static func getUniqueIdentifier() -> Int {
+    private static func getUniqueIdentifier() -> Int {
         identifierFactory += 1
         return identifierFactory
     }
